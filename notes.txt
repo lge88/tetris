@@ -1,0 +1,42 @@
+
+   L0   L1    L2    L3  L0
+   |    |     |     |
+-  a         dc      d
+   b   cba    b    abc
+   cd  d      a
+
+   J0   J1    J2    J3  J0
+   |    |     |     |
+-  b    a     da  bcd
+   c    dcb   c     a
+  ad          b
+
+   O   O
+   |
+-  ac
+   bd
+
+   I0    I1    I2    I3   I0
+   |     |     |     |
+-  a           d
+   b   dcba    c    abcd
+   c           b
+   d           a
+
+   S0    S1     S2    S3  S0
+   |     |      |     |
+-  bd    a      ca   d
+  ac     cb    db    bc
+          d           a
+
+   Z0    Z1     Z2    Z3  Z0
+   |     |      |     |
+- ab     a     dc      d
+   cd   cb      ba    bc
+        d             a
+
+   T0    T1     T2    T3  T0
+   |     |      |     |
+-  b     a            d
+  acd    cb    dca   bc
+         d      b     a
