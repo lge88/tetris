@@ -11,7 +11,6 @@ class Canvas2DRenderer {
     this._pixelWidth = pixelWidth;
     this._pixelHeight = pixelHeight;
     this._ctx = canvas.getContext('2d');
-    this.debug = false;
   }
 
   clear() {
@@ -21,11 +20,12 @@ class Canvas2DRenderer {
     this._ctx.restore();
   }
 
-  drawBanner({ text }) {
+  drawBanner({ text, color = 'red' }) {
     this._ctx.save();
     const { width, height } = this._ctx.canvas;
     const cx = 0.5 * width, cy = 0.5 * height;
     this._ctx.font = '48px serif';
+    this._ctx.fillStyle = color;
     this._ctx.textAlign = 'center';
     this._ctx.textBaseline = 'middle';
     this._ctx.fillText(text, cx, cy);
@@ -42,7 +42,7 @@ class Canvas2DRenderer {
     return this;
   }
 
-  drawPixels({ pixels, color }) {
+  drawPixels({ pixels, color, debug = false }) {
     const { _dx: dx, _dy: dy, _pixelWidth: w, _pixelHeight: h } = this;
     this._ctx.save();
     this._ctx.fillStyle = color;
@@ -52,7 +52,7 @@ class Canvas2DRenderer {
       this._ctx.fillRect(p.x, p.y, w, h);
     });
 
-    if (this.debug === true) {
+    if (debug === true) {
       this._ctx.font = '20px serif';
       this._ctx.textAlign = 'center';
       this._ctx.textBaseline = 'middle';
@@ -133,6 +133,39 @@ const PieceConfigurations = {
     [ { x: +1, y: +1 }, { x: +0, y: +1 }, { x: -1, y: +1 }, { x: -1, y: +2 } ], // L1
     [ { x: +0, y: +2 }, { x: +0, y: +1 }, { x: +0, y: +0 }, { x: -1, y: +0 } ], // L2
     [ { x: -1, y: +1 }, { x: +0, y: +1 }, { x: +1, y: +1 }, { x: +1, y: +0 } ], // L3
+  ],
+  J: [
+    [ { x: -1, y: +1 }, { x: +0, y: -1 }, { x: +0, y: +0 }, { x: +0, y: +1 } ], // J0
+    [ { x: -1, y: -1 }, { x: +1, y: +0 }, { x: +0, y: +0 }, { x: -1, y: +0 } ], // J1
+    [ { x: +1, y: -1 }, { x: +0, y: +1 }, { x: +0, y: +0 }, { x: +0, y: -1 } ], // J2
+    [ { x: +1, y: +1 }, { x: -1, y: +0 }, { x: +0, y: +0 }, { x: +1, y: +0 } ], // J3
+  ],
+  O: [
+    [ { x: +0, y: +0 }, { x: +0, y: +1 }, { x: +1, y: +0 }, { x: +1, y: +1 } ], // O
+  ],
+  I: [
+    [ { x: +0, y: -1 }, { x: +0, y: +0 }, { x: +0, y: +1 }, { x: +0, y: +2 } ], // I0
+    [ { x: +1, y: +0 }, { x: +0, y: +0 }, { x: -1, y: +0 }, { x: -2, y: +0 } ], // I1
+    [ { x: +0, y: +2 }, { x: +0, y: +1 }, { x: +0, y: +0 }, { x: +0, y: -1 } ], // I2
+    [ { x: -1, y: +0 }, { x: +0, y: +0 }, { x: +1, y: +0 }, { x: +2, y: +0 } ], // I3
+  ],
+  S: [
+    [ { x: -1, y: +0 }, { x: +0, y: -1 }, { x: +0, y: +0 }, { x: +1, y: -1 } ], // S0
+    [ { x: +0, y: -1 }, { x: +1, y: +0 }, { x: +0, y: +0 }, { x: +1, y: +1 } ], // S1
+    [ { x: +1, y: +0 }, { x: +0, y: +1 }, { x: +0, y: +0 }, { x: -1, y: +1 } ], // S2
+    [ { x: +0, y: +1 }, { x: -1, y: +0 }, { x: +0, y: +0 }, { x: -1, y: -1 } ], // S3
+  ],
+  Z: [
+    [ { x: -1, y: -1 }, { x: +0, y: -1 }, { x: +0, y: +0 }, { x: +1, y: +0 } ], // Z0
+    [ { x: +1, y: -1 }, { x: +1, y: +0 }, { x: +0, y: +0 }, { x: +0, y: +1 } ], // Z1
+    [ { x: +1, y: +1 }, { x: +0, y: +1 }, { x: +0, y: +0 }, { x: -1, y: +0 } ], // Z2
+    [ { x: -1, y: +1 }, { x: -1, y: +0 }, { x: +0, y: +0 }, { x: +0, y: -1 } ], // Z3
+  ],
+  T: [
+    [ { x: -1, y: +0 }, { x: +0, y: -1 }, { x: +0, y: +0 }, { x: +1, y: +0 } ], // T0
+    [ { x: +0, y: -1 }, { x: +1, y: +0 }, { x: +0, y: +0 }, { x: +0, y: +1 } ], // T1
+    [ { x: +1, y: +0 }, { x: +0, y: +1 }, { x: +0, y: +0 }, { x: -1, y: +0 } ], // T2
+    [ { x: +0, y: +1 }, { x: -1, y: +0 }, { x: +0, y: +0 }, { x: +0, y: -1 } ], // T3
   ]
 };
 
@@ -143,6 +176,59 @@ const L0 = ({ x, y, color }) => L({ x, y, i: 0, color });
 const L1 = ({ x, y, color }) => L({ x, y, i: 1, color });
 const L2 = ({ x, y, color }) => L({ x, y, i: 2, color });
 const L3 = ({ x, y, color }) => L({ x, y, i: 3, color });
+
+const J = ({ x, y, i, color }) => {
+  return new Piece({ x, y, i, color, configurations: PieceConfigurations.J });
+};
+const J0 = ({ x, y, color }) => J({ x, y, i: 0, color });
+const J1 = ({ x, y, color }) => J({ x, y, i: 1, color });
+const J2 = ({ x, y, color }) => J({ x, y, i: 2, color });
+const J3 = ({ x, y, color }) => J({ x, y, i: 3, color });
+
+const O = ({ x, y, color }) => {
+  return new Piece({ x, y, i: 0, color, configurations: PieceConfigurations.O });
+};
+
+const I = ({ x, y, i, color }) => {
+  return new Piece({ x, y, i, color, configurations: PieceConfigurations.I });
+};
+const I0 = ({ x, y, color }) => I({ x, y, i: 0, color });
+const I1 = ({ x, y, color }) => I({ x, y, i: 1, color });
+const I2 = ({ x, y, color }) => I({ x, y, i: 2, color });
+const I3 = ({ x, y, color }) => I({ x, y, i: 3, color });
+
+const S = ({ x, y, i, color }) => {
+  return new Piece({ x, y, i, color, configurations: PieceConfigurations.S });
+};
+const S0 = ({ x, y, color }) => S({ x, y, i: 0, color });
+const S1 = ({ x, y, color }) => S({ x, y, i: 1, color });
+const S2 = ({ x, y, color }) => S({ x, y, i: 2, color });
+const S3 = ({ x, y, color }) => S({ x, y, i: 3, color });
+
+const Z = ({ x, y, i, color }) => {
+  return new Piece({ x, y, i, color, configurations: PieceConfigurations.Z });
+};
+const Z0 = ({ x, y, color }) => Z({ x, y, i: 0, color });
+const Z1 = ({ x, y, color }) => Z({ x, y, i: 1, color });
+const Z2 = ({ x, y, color }) => Z({ x, y, i: 2, color });
+const Z3 = ({ x, y, color }) => Z({ x, y, i: 3, color });
+
+const T = ({ x, y, i, color }) => {
+  return new Piece({ x, y, i, color, configurations: PieceConfigurations.T });
+};
+const T0 = ({ x, y, color }) => T({ x, y, i: 0, color });
+const T1 = ({ x, y, color }) => T({ x, y, i: 1, color });
+const T2 = ({ x, y, color }) => T({ x, y, i: 2, color });
+const T3 = ({ x, y, color }) => T({ x, y, i: 3, color });
+
+// Generate a random int in [0, n-1] inclusive
+function randomInt(n) {
+  return Math.floor(n * Math.random());
+}
+
+function randomPick(arr) {
+  return arr[randomInt(arr.length)];
+}
 
 class Game {
   // configs:
@@ -301,9 +387,20 @@ class Game {
 
   generateNewPiece() {
     // Choose a piece randomly (type, color)
-    // Check if generated piece will all ready hits ground
-    // return L0({ x: 0, y: 3, color: 'yellow' });
-    return L0({ x: this.nx >> 2, y: -3, color: 'yellow' });
+    // const colors = [ 'red', 'green', 'purple', 'yellow', 'blue' ];
+    // const color = randomPick(colors);
+    const color = 'yellow';
+    const ctrs = [
+      L0, L1, L2, L3,
+      J0, J1, J2, J3,
+      O,
+      I0, I1, I2, I3,
+      S0, S1, S2, S3,
+      Z0, Z1, Z2, Z3,
+      T0, T1, T2, T3,
+    ];
+    const T = randomPick(ctrs);
+    return T({ x: this.nx >> 1, y: -1, color });
   }
 
   isUnderGround(piece) {
@@ -335,8 +432,8 @@ class Game {
   tryKillRows() {
     const { nx, ny, board } = this;
 
-    let offset = 0;
-    for (let y = ny - 1; y >= 0; --y) {
+    let tail = ny;
+    for (let y = ny - 1; y >= -1; --y) {
       let shouldKillThisRow = true;
       for (let x = 0; x < nx; ++x) {
         const i = this.pixelToIndex({ x, y });
@@ -346,14 +443,13 @@ class Game {
         }
       }
 
-      if (shouldKillThisRow === true) ++offset;
-
-      if (offset === 0) continue;
-
-      for (let x = 0; x < nx; ++x) {
-        const i = this.pixelToIndex({ x, y });
-        const j = this.pixelToIndex({ x, y: y - offset });
-        board[i] = board[j];
+      if (shouldKillThisRow === false) {
+        --tail;
+        for (let x = 0; x < nx; ++x) {
+          const i = this.pixelToIndex({ x, y: tail });
+          const j = this.pixelToIndex({ x, y });
+          board[i] = board[j];
+        }
       }
     }
   }
@@ -406,20 +502,14 @@ class Game {
     const filled = board.map((isFilled, i) => Object.assign(this.indexToPixel(i), { isFilled }))
       .filter((p) => p.isFilled)
       .map(({ x, y }) => ({ x, y }));
-    // board.forEach((x, i) => {
-    //   if (x === true) {
-    //     filled.push(this.indexToPixel(i));
-    //   }
-    // });
-    renderer.drawPixels({ pixels: filled, color: 'black' });
+    renderer.drawPixels({ pixels: filled, color: 'blue' });
   }
 }
 
-
 var game = new Game;
 game.canvasId = 'canvas';
-game.nx = 5;
-game.ny = 10;
+game.nx = 10;
+game.ny = 20;
 game.spacingRatio = 0.1;
 game.frameInterval = 500;
 game.start();
